@@ -1,7 +1,8 @@
 import numpy as np
-from ipynb.fs.defs.toolbox import N, S, E, W, discreteProb
-from ipynb.fs.full.maze_plotter import maze_plotter
+from toolbox import N, S, E, W, discreteProb
+from maze_plotter import maze_plotter # used to plot the maze
 
+    
 class simple_actspace(): #class describing the action space of the markov decision process
     def __init__(self, action_list=[], nactions=0):
         if len(action_list) == 0:
@@ -42,8 +43,10 @@ class mdp(): #defines a Markov Decision Process
     
     
 
-    def reset(self, uniform=False): 
-    
+    def reset(self, uniform=False): #initializes an episode and returns the state of the agent
+        #if uniform is set to False, the first state is drawn according to the P0 distribution, 
+        #else it's drawn on a uniform distribution over all the states
+        
         if uniform :
             prob = np.ones((self.observation_space.size))/self.observation_space.size
             self.current_state = discreteProb(prob)
@@ -60,7 +63,7 @@ class mdp(): #defines a Markov Decision Process
         # if you want to add some noise to the reward, give a value to the deviation param 
         # which represents the mean μ of the normal distribution used to draw the noise 
         
-        noise = 0 # = deviation*np.random.randn() # generate noise, see an exercize in mbrl.ipynb
+        noise = deviation*np.random.randn() # = deviation*np.random.randn() # generate noise, see an exercize in mbrl.ipynb
         reward = self.r[self.current_state,u] +noise # r is the reward of the transition, you can add some noise to it 
         
         # the state reached when performing action u from state x is sampled 
@@ -231,63 +234,4 @@ class maze_mdp(mdp): #defines a Markov Decision Process which observation space 
         self.last_action_achieved = False
         return self.current_state
         
-
-
-def VI_Q(mdp, render=True): #Value Iteration based on the state-action value Q
-    #Same as above, but we save all the computed values in the Q table 
-    #(instead of saving only the optimal value of each state), so there is no need for a V_temp list
-    Q = np.zeros((mdp.observation_space.size,mdp.action_space.size))
-    pol = np.zeros((mdp.observation_space.size))
-    quitt = False
-    
-    Q_list = [Q.copy()] 
-    pol_list = [pol.copy()]
-    Qmax = Q.max(axis=1)
         
-    if render:
-        mdp.new_render()
-
-    i=0
-    while quitt==False:
-        Qold = Q.copy()
-        
-        if render:
-            mdp.render(Q,pol)
-        i+=1
-        #print("iteration : {}".format(i))
-        for x in mdp.observation_space.states :
-           # print("x = {}".format(x))
-            for u in mdp.action_space.actions :
-                #print("u = {}".format(u))
-                sum =0
-                for y in mdp.observation_space.states:
-                    #if i==3 and x>51:
-                        #print("y = {}".format(y))
-                    uy_opt=0
-                    uy_val=0
-                    for uy in mdp.action_space.actions :
-                    #if i == 3 and x>51:
-                           # print("uy = {}".format(uy))
-                        if(Qold[y,uy] > uy_val):
-                            uy_val = Qold[y,uy]
-                            uy_opt = uy
-                        
-                    sum = sum + mdp.P[x,u,y]*Qold[y,uy_opt]
-                
-                
-                Q[x,u] = mdp.r[x,u]+mdp.gamma*sum
-                                
-        Qmax = Q.max(axis=1)
-        pol =  np.argmax(Q,axis=1)
-
-        Q_list.append(Q.copy())
-        pol_list.append(pol)
-        
-       
-        if (np.linalg.norm(Q-Qold)) <= 0.01 :
-            quitt = True
-    
-    if render:
-        mdp.render(Q,pol)
-        
-    return [Q_list, pol_list]
