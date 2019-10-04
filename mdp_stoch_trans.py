@@ -23,7 +23,7 @@ class simple_actspace(): #class describing the action space of the markov decisi
 
         
     
-class mdp(): #defines a Markov Decision Process
+class my_mdp(): #defines a Markov Decision Process
 
     def __init__(self, observation_space, action_space, start_distribution, transition_matrix,
                   reward_matrix, plotter, gamma=0.9, terminal_states=[], timeout=50):
@@ -115,7 +115,7 @@ class mdp(): #defines a Markov Decision Process
         return self.plotter.create_animation(V_list,policy_list,nframes)
     
 
-class maze(): #describes a maze-like environment
+class my_maze(): #describes a maze-like environment
     def __init__(self, width, height, walls=[]):
         self.width = width
         self.height = height
@@ -125,7 +125,7 @@ class maze(): #describes a maze-like environment
      
 
     
-class maze_mdp(mdp):  # defines a Markov Decision Process which observation space is a maze
+class my_maze_mdp(my_mdp):  # defines a Markov Decision Process which observation space is a maze
 
     def __init__(self, width, height, walls=[], action_list=[], nactions=4,
                  gamma=0.9, timeout=50, start_states=[0], terminal_states=[], rewards=[], stochasticity=0):
@@ -141,7 +141,7 @@ class maze_mdp(mdp):  # defines a Markov Decision Process which observation spac
         
         # ##################### State Space ######################
         
-        observation_space = maze(width, height, walls)
+        observation_space = my_maze(width, height, walls)
         
         # ##################### Action Space ######################
         
@@ -315,7 +315,7 @@ class maze_mdp(mdp):  # defines a Markov Decision Process which observation spac
         # reward_matrix[25][NoOp] = 0.9
         
         plotter = maze_plotter(observation_space, terminal_states)  # renders the environment
-        mdp.__init__(self, observation_space, action_space, start_distribution, transition_matrix,
+        my_mdp.__init__(self, observation_space, action_space, start_distribution, transition_matrix,
                  reward_matrix, plotter, gamma=gamma, terminal_states=terminal_states, timeout=timeout)
 
     def reset(self, uniform=False):  # initializes an episode
